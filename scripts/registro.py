@@ -13,6 +13,7 @@ córranlo con MSYS_NO_PATHCONV=1 delante, o desde PowerShell.
 """
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
@@ -25,10 +26,38 @@ RAIZ = Path(__file__).resolve().parent.parent
 MAX_RESULTADO = 1500        # caracteres de cada resultado de herramienta que entran al .md
 
 
+CORREOS_PERMITIDOS = {"noreply@anthropic.com"}      # el de la línea Co-Authored-By de los commits
+
+
+def _correo(m):
+    return m.group(0) if m.group(0).lower() in CORREOS_PERMITIDOS else "[correo oculto]"
+
+
+def variantes_usuario():
+    """El nombre de usuario de Windows tal como aparece en rutas y listados (con espacio, con guion y abreviado)."""
+    nombre = Path.home().name
+    corto = Path(os.environ.get("TEMP", "")).parts[2:3]
+    return {nombre, nombre.replace(" ", "-"), *corto} - {""}
+
+
 def ocultar(texto):
-    """Quita la ruta de la carpeta personal (con / o con \\ y \\\\) y cualquier correo."""
+    """Quita la ruta y el nombre de usuario de la carpeta personal y los correos de un texto ya decodificado."""
     texto = re.sub(r"[A-Za-z]:(?:\\\\|\\|/)Users(?:\\\\|\\|/)[^\\/\"'\n]+", "~", texto)
-    return re.sub(r"[\w.+-]+@[\w-]+\.[\w.-]+", "[correo oculto]", texto)
+    texto = re.sub(r"(?<![\w.+-])[\w.+-]+@[\w-]+(?:\.[\w-]+)*\.[A-Za-z]{2,}\b", _correo, texto)
+    for termino in sorted(variantes_usuario(), key=len, reverse=True):
+        texto = re.sub(re.escape(termino), "usuario", texto, flags=re.I)
+    return texto
+
+
+def ocultar_todo(x):
+    """ocultar() en cada texto de un objeto JSON. Sobre el JSON ya escrito rompería los escapes («\\n@mcp.tool»)."""
+    if isinstance(x, str):
+        return ocultar(x)
+    if isinstance(x, list):
+        return [ocultar_todo(v) for v in x]
+    if isinstance(x, dict):
+        return {k: ocultar_todo(v) for k, v in x.items()}
+    return x
 
 
 def comando(prompt, mcp=False, skills=False, modelo="sonnet", herramientas=None, permitidas=None):
@@ -51,15 +80,24 @@ def correr(base, prompt, cwd=RAIZ, **opciones):
     base = Path(base)
     base.parent.mkdir(parents=True, exist_ok=True)
     cmd = comando(prompt, **opciones)
+    # En una copia limpia del proyecto (scripts/espacio_limpio.py), uv usa el entorno de este proyecto
+    entorno = os.environ | {"UV_PROJECT_ENVIRONMENT": str(RAIZ / ".venv")}
     inicio = time.time()
-    proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", cwd=cwd, timeout=1800)
+    proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", cwd=cwd, timeout=1800, env=entorno)
     cabecera = {"type": "registro", "prompt": prompt, "comando": cmd[:2] + ["<pregunta>"] + cmd[3:],
                 "cwd": Path(cwd).resolve().relative_to(RAIZ).as_posix() if Path(cwd).resolve().is_relative_to(RAIZ)
                 else Path(cwd).name, "fecha": datetime.now().isoformat(timespec="seconds"),
                 "segundos": round(time.time() - inicio, 1), "codigo_salida": proc.returncode,
                 "stderr": proc.stderr[-2000:]}
     jsonl = base.with_suffix(".jsonl")
-    jsonl.write_text(ocultar(json.dumps(cabecera, ensure_ascii=False) + "\n" + proc.stdout), encoding="utf-8")
+    lineas = [json.dumps(ocultar_todo(cabecera), ensure_ascii=False)]
+    for linea in proc.stdout.splitlines():
+        if linea.strip():
+            try:
+                lineas.append(json.dumps(ocultar_todo(json.loads(linea)), ensure_ascii=False))
+            except json.JSONDecodeError:
+                lineas.append(json.dumps({"type": "texto_no_json", "texto": ocultar(linea)}, ensure_ascii=False))
+    jsonl.write_text("\n".join(lineas) + "\n", encoding="utf-8")
     md = a_markdown(jsonl)
     print(f"{jsonl.name}: {cabecera['segundos']} s, salida {proc.returncode}; {md}")
     return jsonl

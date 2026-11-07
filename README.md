@@ -6,7 +6,8 @@ Tarea 4 del curso Python Intermedio ([issue #201](https://github.com/d2cml-ai/Da
 Claude Code coordina un servidor MCP con las series del BCRP y tres Skills que procesan la ENAHO 2024 del INEI, y
 responde preguntas con cifras que se pueden rastrear y reproducir.
 
-> **Estado:** Parte 1 (servidor MCP del BCRP) terminada. Las Partes 2 a 4 se completan en las siguientes entregas.
+> **Estado:** Parte 1 (servidor MCP del BCRP) y Parte 2 (Skills de la ENAHO) terminadas. Las Partes 3 y 4 se
+> completan en las siguientes entregas.
 
 ## 1. Objetivo del proyecto
 
@@ -32,8 +33,10 @@ flowchart LR
 |---|---|---|
 | Servidor MCP `bcrp` | `mcp/server.py` | Busca, descarga y resume series del BCRP; compara los 25 departamentos |
 | Configuración MCP | `.mcp.json` | Conecta el servidor a Claude Code (alcance de proyecto) |
-| Skills de la ENAHO | `.claude/skills/` | *Parte 2* |
+| Skills de la ENAHO | `.claude/skills/` | Limpian y validan los módulos 34 y 02, grafican y mapean la pobreza ponderada |
 | Registro de ejecuciones | `scripts/registro.py` | Corre `claude -p` y guarda cada llamada a herramientas como evidencia |
+| Copia limpia | `scripts/espacio_limpio.py` | Copia el proyecto sin salidas, para correr a Claude Code desde cero |
+| Exportar conversaciones | `scripts/exportar_conversacion.py` | Pasa la sesión de Claude Code a Markdown y JSON, sin datos personales |
 
 ## 3. Herramientas MCP
 
@@ -64,7 +67,46 @@ o un año que el BCRP aún no publica devuelven un mensaje que lo dice, en vez d
 
 ## 4. Skills de la ENAHO
 
-*Parte 2: `limpiando-enaho`, `graficando-enaho` y `mapeando-enaho`.*
+Tres Skills en `.claude/skills/`, según el método de la
+[Sesión 16](https://github.com/d2cml-ai/Data-Science-Python/tree/main/sessions/16-skills-enaho). Cada `SKILL.md` dice
+cuándo usarla y qué comando correr; las cuentas las hacen sus scripts, no el modelo.
+
+| Skill | Qué hace | Scripts | Salidas |
+|---|---|---|---|
+| `limpiando-enaho` | Baja los módulos 34 y 02, los lee sin convertir categorías y con las llaves como texto, normaliza los nombres, filtra a los residentes habituales, une personas y hogares con `merge(validate="m:1")`, pondera y valida. Si una validación esencial falla, no guarda la base y termina con error | `descargar.py`, `limpiar.py`, `consultar.py` | `salidas/personas_2024.parquet`, `salidas/hogares_2024.parquet`, `salidas/validacion.txt`, `salidas/indicadores.csv` |
+| `graficando-enaho` | Gráficos ponderados de la pobreza por área, sexo (de la persona y de quien encabeza el hogar), edad, departamento y dominio, con título que dice el hallazgo, unidad, año y fuente | `graficar.py` | `figuras/pobreza_*.png` y un CSV gemelo con las cifras de cada uno |
+| `mapeando-enaho` | Mapa coroplético de los 25 departamentos unido por código (`ubigeo[:2]` = `FIRST_IDDP`), con Lima y Callao separados, comparado con la referencia de la Sesión 16 | `mapear.py` | `mapas/pobreza_departamento_2024.png` y su CSV, `salidas/comparacion_mapa.csv` |
+
+**Validación: 19 de 19 verificaciones aprobadas** ([`salidas/validacion.txt`](salidas/validacion.txt)).
+
+| Indicador | Obtenido | Referencia |
+|---|---:|---:|
+| Pobreza monetaria nacional, método del INEI (sumaria con `factor07 × mieperho`) | 27.58 % | 27.6 % |
+| Pobreza monetaria nacional, residentes con `facpob07` | 27.53 % | 27.6 % ± 0.1 |
+| Residentes habituales | 108 664 | 108 664 |
+| Unidades territoriales con dato | 25 | 25 |
+| Pobreza urbana / rural | 24.81 % / 39.30 % | 24.8 % / 39.3 % |
+| Lima Metropolitana / pobreza extrema | 28.21 % / 5.50 % | 28.2 % / 5.5 % |
+| 25 departamentos frente a la Sesión 16 | diferencia máxima de 0.05 puntos | — |
+
+**Dos ponderaciones, cada una con su unidad de análisis.** La pobreza de un territorio o de un tipo de hogar se
+calcula como el INEI, con la sumaria ponderada por `factor07 × mieperho`, y reproduce las cifras oficiales. La
+pobreza según un rasgo de la persona (sexo, edad) usa a los residentes con `facpob07`. Un promedio simple daría
+25.61 %: por eso todo se pondera.
+
+**Coordinación entre Skills.** Las de gráficos y mapas revisan primero si existe la base limpia; si no, usan antes
+`limpiando-enaho`. Prueba: ante el pedido *«Haz un mapa de la pobreza monetaria por departamento con ENAHO 2024»*,
+en una copia del proyecto sin salidas, Claude Code activó `mapeando-enaho`, vio que faltaba la base, activó
+`limpiando-enaho`, corrió la limpieza y después el mapa
+([registro completo](evidencias_ia/skills/01_mapa_coordinado.md)).
+
+<img src="mapas/pobreza_departamento_2024.png" alt="Mapa de la pobreza monetaria por departamento, Perú 2024" width="520">
+
+<img src="figuras/pobreza_area.png" alt="Pobreza urbana y rural, Perú 2024" width="640">
+
+Los demás gráficos: [sexo](figuras/pobreza_sexo.png), [edad](figuras/pobreza_edad.png),
+[departamentos](figuras/pobreza_departamento.png) (y [con Piura resaltado](figuras/pobreza_departamento_piura.png)),
+[dominios](figuras/pobreza_dominio.png).
 
 ## 5. Fuentes y descarga de los datos
 
@@ -76,8 +118,9 @@ o un año que el BCRP aún no publica devuelven un mensaje que lo dice, en vez d
 | Curso | Límites departamentales del Perú | https://raw.githubusercontent.com/d2cml-ai/Data-Science-Python/main/sessions/06-geoespacial/lab/Data/peru_departamental_simple.geojson |
 
 El servidor MCP baja solo el catálogo del BCRP (unos 7 MB) a `datos/bcrp/` y guarda cada respuesta de la API 12
-horas en `datos/bcrp/cache/`. La carpeta `datos/` no se sube a GitHub. *La descarga de la ENAHO se documenta en la
-Parte 2.*
+horas en `datos/bcrp/cache/`. Los microdatos de la ENAHO (22 MB) se bajan a `datos/enaho/` con
+`uv run .claude/skills/limpiando-enaho/scripts/descargar.py`; el GeoJSON y la referencia de la Sesión 16 los baja la
+skill de mapas si faltan. La carpeta `datos/` no se sube a GitHub.
 
 ## 6. Instalación con `uv`
 
@@ -120,6 +163,20 @@ uv run scripts/registro.py correr evidencias_ia/mcp/01_inflacion_lima "¿Cuál f
 terminal, web), para que las cifras salgan únicamente del MCP. En Git Bash, un prompt que empieza con `/` debe ir con
 `MSYS_NO_PATHCONV=1` delante.
 
+La ENAHO, paso a paso (lo mismo que hacen las Skills):
+
+```bash
+uv run .claude/skills/limpiando-enaho/scripts/descargar.py          # módulos 34 y 02 a datos/enaho/
+uv run .claude/skills/limpiando-enaho/scripts/limpiar.py            # base limpia, validacion.txt e indicadores.csv
+uv run .claude/skills/limpiando-enaho/scripts/consultar.py --por area --donde "departamento == 'Piura'"
+uv run .claude/skills/graficando-enaho/scripts/graficar.py --tipo todos
+uv run .claude/skills/mapeando-enaho/scripts/mapear.py --resaltar Piura
+
+# Claude Code desde cero: una copia sin salidas y un pedido en lenguaje natural
+uv run scripts/espacio_limpio.py ../copia_limpia
+uv run scripts/registro.py correr evidencias_ia/skills/01_mapa_coordinado "Haz un mapa de la pobreza monetaria por departamento con ENAHO 2024." --skills --herramientas "Skill,Bash,Read,Glob,Grep" --permitidas "Bash,Read,Glob,Grep" --cwd ../copia_limpia
+```
+
 ## 9. Resultados de la evaluación
 
 *Parte 4.*
@@ -135,6 +192,16 @@ terminal, web), para que las cifras salgan únicamente del MCP. En Git Bash, un 
   no se usa para rechazar pedidos.
 - **Los indicadores departamentales son nominales y anuales**; para comparar años hay que considerar la inflación.
 - En Git Bash, `/mcp__bcrp__informe` se convertía en una ruta de Windows; se corre con `MSYS_NO_PATHCONV=1`.
+- **Dos ponderaciones dan dos cifras nacionales** (27.58 % y 27.53 %). Las dos están dentro de la tolerancia; se
+  usa la del INEI para territorios y la de personas para sexo y edad, y cada gráfico dice cuál usa.
+- **La ENAHO es una muestra.** Las cifras por departamento tienen error muestral (el INEI publica sus intervalos de
+  confianza; aquí no se calculan). `consultar.py` marca los grupos con menos de 100 hogares en la muestra.
+- **La pobreza se mide por hogar**: todos sus miembros comparten la condición del hogar. Por eso casi no cambia según
+  el sexo de la persona (27.7 % y 27.4 %); la diferencia aparece según quién encabeza el hogar.
+- **Una revisión de seguridad bloqueó borrar las salidas** para probar las Skills desde cero. En vez de borrar, las
+  pruebas corren en una copia limpia del proyecto (`scripts/espacio_limpio.py`), que además impide leer resultados
+  previos.
+- En el mapa, las etiquetas de Lambayeque, Moquegua y Huancavelica rozan los bordes; se leen bien.
 
 ## 11. Ejemplo de una ejecución completa
 
@@ -151,8 +218,12 @@ Todo está en [`evidencias_ia/`](evidencias_ia/), sin rutas personales ni correo
 | Carpeta | Contenido |
 |---|---|
 | [`mcp/`](evidencias_ia/mcp/) | `pruebas.txt` (10 passed, con la verificación de que `test_server.py` es idéntico al del curso) y 5 ejecuciones de Claude Code con el MCP: herramientas, herramienta propia, recursos, prompt y una consulta sin datos |
-| `skills/` | *Parte 2* |
+| [`skills/`](evidencias_ia/skills/) | 6 ejecuciones de Claude Code con las Skills: el mapa pedido en lenguaje natural que activa limpieza y mapa en cadena, un gráfico y una pregunta en lenguaje natural, y la invocación directa de cada Skill con `/nombre` |
 | `integracion/` | *Parte 3* |
 | `evaluacion/` | *Parte 4* |
 
-Las conversaciones completas de desarrollo con Claude Code se exportan al final del proyecto.
+**Conversaciones de desarrollo (Opción B, exportación).** Cada carpeta tiene `00_conversacion.md` (legible) y
+`00_conversacion.json` (completo) con la conversación con Claude Code de esa etapa: cada mensaje, respuesta,
+herramienta y resultado. Se exportaron con `scripts/exportar_conversacion.py` desde el registro que guarda Claude
+Code, sin el razonamiento interno del modelo y sin datos personales (rutas, nombre de usuario, correos, notas de
+memoria del asistente sobre otras tareas y nombres de terceros).
