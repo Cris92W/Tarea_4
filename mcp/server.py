@@ -220,17 +220,25 @@ def _serie(codigo, desde, hasta):
     return salida
 
 
-@mcp.tool(annotations=SOLO_LECTURA)
-def serie(codigo: str, desde: str | int, hasta: str | int) -> dict:
+@mcp.tool(annotations={"readOnlyHint": False, "destructiveHint": False, "openWorldHint": True})
+def serie(codigo: str, desde: str | int, hasta: str | int, guardar: bool = False) -> dict:
     """Descarga los datos oficiales de una serie del BCRP entre dos fechas.
 
     codigo: el que da buscar_series, p. ej. "PN01273PM" (inflación de Lima a 12 meses).
     desde / hasta: "2025" (año), "2025-03" (mes), "2025-T1" (trimestre) o "2026-10-15" (día); se ajustan a la
     frecuencia de la serie. Devuelve los datos como [{"periodo": "2025-03", "valor": 0.81}] (sin los «n.d.»), el
     enlace a la API usada (fuente) y el de la tabla en la web del BCRP para verificarlos (fuente_web).
+    guardar: True escribe además los datos en salidas/bcrp/ como CSV, para usarlos en un script (p. ej. un índice
+    de precios para deflactar) sin copiar cifras a mano.
     Para variaciones, promedios o extremos usen resumen en vez de calcular con estos datos.
     """
     s = _serie(codigo, desde, hasta)
+    if guardar and s["datos"]:
+        destino = RAIZ / "salidas" / "bcrp" / f"serie_{codigo}_{s['datos'][0]['periodo']}_{s['datos'][-1]['periodo']}.csv"
+        destino.parent.mkdir(parents=True, exist_ok=True)
+        pd.DataFrame(s["datos"]).assign(codigo=codigo, nombre=s["nombre"], fuente=s["fuente"]).to_csv(
+            destino, index=False, encoding="utf-8")
+        s["archivo"] = destino.relative_to(RAIZ).as_posix()
     if len(s["datos"]) > MAX_PUNTOS:
         s["nota"] = (f"Son {len(s['datos'])} datos; se muestran los últimos {MAX_PUNTOS}. Para todo el periodo "
                      "usen resumen o acorten el rango.")
@@ -419,10 +427,11 @@ def panel_departamental(indicador: str, anio: int, anio_base: int | None = None,
                 "nominales y del año calendario; para compararlos entre años consideren la inflación."}
     if guardar:
         sufijo = f"{anio}" + (f"_{anio_base}" if anio_base else "")
-        nombre = re.sub(r"[^a-z0-9]+", "_", _normal(grupo)).strip("_")[:60]
+        # Nombre corto (tres palabras): en Windows la ruta completa no puede pasar de 260 caracteres
+        nombre = "_".join([p for p in re.findall(r"[a-z0-9]+", _normal(grupo)) if p not in VACIAS][:3])
         destino = RAIZ / "salidas" / "bcrp" / f"panel_{nombre}_{sufijo}.csv"
         destino.parent.mkdir(parents=True, exist_ok=True)
-        pd.DataFrame(filas).assign(indicador=grupo, unidad=unidad, anio=anio, fuente=url).to_csv(
+        pd.DataFrame(filas).assign(indicador=grupo, unidad=unidad, anio=anio, anio_base=anio_base, fuente=url).to_csv(
             destino, index=False, encoding="utf-8")
         salida["archivo"] = destino.relative_to(RAIZ).as_posix()
     return salida
