@@ -48,7 +48,7 @@ NEGACION = re.compile(r"\b(no|sin)\b[^.]{0,40}\b(causa|causal|causalidad)", re.I
 
 
 def preparar(modo, pregunta_id, trabajo):
-    carpeta = trabajo / f"{modo}_{pregunta_id}"
+    carpeta = trabajo / f"{modo}_{pregunta_id}_{time.strftime('%H%M%S')}"     # nueva cada vez: nunca se borra nada
     if modo == "A":
         carpeta.mkdir(parents=True, exist_ok=False)                   # vacía: nada que leer
     else:

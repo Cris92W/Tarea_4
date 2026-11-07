@@ -1,0 +1,2 @@
+id,modo,resultado,motivo
+c2,B,correcta,"La regla automática buscaba las palabras «negativa» o «inversa». La respuesta dice que «los departamentos con más pobreza tienden a tener menos crédito directo por habitante» (una asociación negativa) y que «es una asociación entre departamentos, no causal»: cumple el criterio fijado en preguntas.csv antes de correr. El valor (−0.604) está dentro de la tolerancia."
