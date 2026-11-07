@@ -1,0 +1,30 @@
+# Pruebas del servidor MCP del BCRP
+
+Fecha: 2026-11-07 10:56 (hora de Perú)
+Blob de git de mcp/test_server.py (git hash-object):        1d0316861e999d9484f4306e38d47347bb803958
+Blob del curso (GitHub, sessions/04-mcp-claude-code/proyecto): 1d0316861e999d9484f4306e38d47347bb803958
+(iguales: las 8 pruebas originales no se modificaron; las 2 propias están en mcp/test_propias.py. El blob de git no depende del fin de línea, que en Windows es CRLF.)
+
+Se borró datos/bcrp/ antes de correr: el catálogo y cada serie se bajaron de la API del BCRP en esta corrida.
+
+$ uv run pytest -v
+============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.2.0, pluggy-1.7.0 -- ~\Documents\Diplomado Ciencia de Datos\Python 1\Python 2\Tarea_4\.venv\Scripts\python.exe
+rootdir: ~\Documents\Diplomado Ciencia de Datos\Python 1\Python 2\Tarea_4
+configfile: pyproject.toml
+testpaths: mcp
+plugins: anyio-4.16.0, platformdirs-4.14.5
+collecting ... collected 10 items
+
+mcp/test_propias.py::test_panel_departamental_trae_los_25_departamentos_con_el_codigo_del_inei PASSED [ 10%]
+mcp/test_propias.py::test_panel_departamental_calcula_la_variacion_y_avisa_si_el_indicador_no_existe PASSED [ 20%]
+mcp/test_server.py::test_buscar_encuentra_el_ipc PASSED                  [ 30%]
+mcp/test_server.py::test_cuatro_herramientas_como_minimo PASSED          [ 40%]
+mcp/test_server.py::test_serie_mensual PASSED                            [ 50%]
+mcp/test_server.py::test_serie_diaria PASSED                             [ 60%]
+mcp/test_server.py::test_resumen_sin_cuentas_a_mano PASSED               [ 70%]
+mcp/test_server.py::test_codigo_inexistente_da_un_error_claro PASSED     [ 80%]
+mcp/test_server.py::test_un_recurso PASSED                               [ 90%]
+mcp/test_server.py::test_un_prompt PASSED                                [100%]
+
+============================= 10 passed in 8.76s ==============================
