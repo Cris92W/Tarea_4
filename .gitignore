@@ -1,0 +1,13 @@
+# Entorno de Python
+.venv/
+__pycache__/
+.pytest_cache/
+
+# Datos descargados: no se suben; los scripts y el servidor MCP los vuelven a bajar
+datos/
+
+# Microdatos procesados (una fila por persona): se regeneran con la skill limpiando-enaho
+salidas/*.parquet
+
+# Permisos locales de Claude Code
+.claude/settings.local.json
