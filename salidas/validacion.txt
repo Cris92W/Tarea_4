@@ -1,0 +1,31 @@
+VALIDACIÓN · ENAHO 2024 (INEI), módulos 34 (sumaria) y 02 (miembros del hogar)
+Generado por .claude/skills/limpiando-enaho/scripts/limpiar.py el 2026-11-07 12:36
+Sumaria:  datos/enaho/966-Modulo34.zip → 966-Modulo34/sumaria-2024.dta (33 691 hogares)
+Personas: datos/enaho/966-Modulo02.zip → 966-Modulo02/enaho01-2024-200.dta (117 721 filas)
+Esencial: si falla, la base no se guarda. Control: se informa, pero no detiene el proceso.
+
+[APROBADA] (esencial) Llaves con sus ceros iniciales (conglome 6, vivienda 3, hogar 2, codperso 2, ubigeo 6 dígitos): todas de ancho fijo y solo dígitos
+[APROBADA] (esencial) Llaves de hogar únicas en la sumaria (conglome, vivienda, hogar): 33 691 hogares, 0 duplicados | esperado: 0 duplicados
+[APROBADA] (esencial) Llaves de persona únicas en el módulo 02 (+ codperso): 117 721 filas, 0 duplicados | esperado: 0 duplicados
+[APROBADA] (esencial) Residentes habituales: ((p204 == 1) & (p205 == 2)) | ((p204 == 2) & (p206 == 1)): 108 664 de 117 721 filas | esperado: 108 664
+[APROBADA] (esencial) Cada hogar de la sumaria tiene un solo jefe o jefa en el módulo 02 (merge 1:1): 0 hogares sin jefe | esperado: 0
+[APROBADA] (esencial) Unión personas-hogares con merge(validate='m:1') sin duplicar ni perder filas: 108 664 filas antes, 108 664 después, 0 personas sin hogar | esperado: iguales y 0
+[APROBADA] (control ) El ubigeo de cada persona coincide con el de su hogar: 0 diferencias | esperado: 0
+[APROBADA] (esencial) Códigos territoriales ubigeo[:2]: los 25 departamentos del INEI, cada uno con nombre: 25 códigos (01 a 25) en personas y en hogares | esperado: 25 (01 a 25)
+[APROBADA] (esencial) Cada residente tiene sexo, edad y factor de expansión: 0 personas con datos faltantes | esperado: 0
+[APROBADA] (esencial) Factores de expansión positivos y sin nulos (facpob07 y factor07): facpob07 suma 34 147 766 personas; factor07 suma 10 360 811 hogares
+[APROBADA] (esencial) La población expandida con personas y con la sumaria difiere menos de 1 %: 34 147 766 (facpob07) frente a 34 482 699 (factor07 × mieperho) | esperado: < 1 %
+[APROBADA] (esencial) Pobreza monetaria nacional, método del INEI: sumaria con factor07 × mieperho (tolerancia 0.1 pp): 27.58 % | esperado: 27.6 %
+[APROBADA] (esencial) Pobreza monetaria nacional, residentes ponderados con facpob07 (tolerancia 0.1 pp): 27.53 % | esperado: 27.6 %
+[APROBADA] (control ) Sin ponderar la cifra cambia (por eso se pondera): promedio simple 25.61 % frente a 27.53 % ponderado
+[APROBADA] (control ) Pobreza urbana (estrato <= 5), método del INEI: 24.81 % (con facpob07: 24.74 %) | esperado: 24.8 %
+[APROBADA] (control ) Pobreza rural (estrato >= 6), método del INEI: 39.30 % (con facpob07: 39.44 %) | esperado: 39.3 %
+[APROBADA] (control ) Pobreza en Lima Metropolitana (dominio 8), método del INEI: 28.21 % (con facpob07: 28.03 %) | esperado: 28.2 %
+[APROBADA] (control ) Pobreza extrema nacional (pobreza == 1), método del INEI: 5.50 % | esperado: 5.5 %
+[APROBADA] (control ) La variable pobreza concuerda con gasto per cápita mensual < línea de pobreza: 99.94 % de los hogares | esperado: >= 99 %
+
+Resultado: 19 aprobadas, 0 fallidas (0 esenciales fallidas).
+Base guardada: salidas/personas_2024.parquet (108 664 residentes habituales, 25 columnas).
+Base de hogares: salidas/hogares_2024.parquet (33 691 hogares, con peso_inei).
+Indicadores ponderados: salidas/indicadores.csv (45 filas).
+Pobreza nacional 2024: 27.58 % con el método del INEI; 27.53 % con residentes y facpob07.

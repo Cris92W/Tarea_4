@@ -1,0 +1,46 @@
+nivel,codigo,categoria,metodo,pobreza_pct,pobreza_extrema_pct,pobreza_pct_facpob07,poblacion,pobres,n_hogares,n_personas,pobres_pct_del_total
+nacional,,Perú,hogares: factor07 × mieperho (INEI),27.58,5.5,27.53,34482699.0,9510145.0,33691,108664,100.0
+area,,Urbana,hogares: factor07 × mieperho (INEI),24.81,3.14,24.74,27887511.0,6918052.0,22031,72593,72.74
+area,,Rural,hogares: factor07 × mieperho (INEI),39.3,15.52,39.44,6595188.0,2592093.0,11660,36071,27.26
+dominio,1,Costa norte,hogares: factor07 × mieperho (INEI),24.28,1.92,24.18,5104587.0,1239525.0,4751,16357,13.03
+dominio,2,Costa centro,hogares: factor07 × mieperho (INEI),14.01,1.08,13.91,2307204.0,323129.0,3287,10859,3.4
+dominio,3,Costa sur,hogares: factor07 × mieperho (INEI),20.15,1.14,20.09,705004.0,142045.0,2283,6576,1.49
+dominio,4,Sierra norte,hogares: factor07 × mieperho (INEI),45.7,21.76,45.83,1899899.0,868205.0,2015,6268,9.13
+dominio,5,Sierra centro,hogares: factor07 × mieperho (INEI),30.1,8.77,30.36,4057363.0,1221137.0,5531,16693,12.84
+dominio,6,Sierra sur,hogares: factor07 × mieperho (INEI),25.6,5.98,25.67,4616008.0,1181688.0,4523,13005,12.43
+dominio,7,Selva,hogares: factor07 × mieperho (INEI),30.02,7.94,29.97,4360929.0,1309337.0,7211,25343,13.77
+dominio,8,Lima Metropolitana,hogares: factor07 × mieperho (INEI),28.21,3.28,28.03,11431707.0,3225079.0,4090,13563,33.91
+departamento,01,Amazonas,hogares: factor07 × mieperho (INEI),25.75,6.01,26.08,442355.0,113901.0,1243,3911,1.2
+departamento,02,Áncash,hogares: factor07 × mieperho (INEI),22.77,5.8,22.88,1212494.0,276140.0,1393,4576,2.9
+departamento,03,Apurímac,hogares: factor07 × mieperho (INEI),23.96,5.24,24.09,494189.0,118401.0,913,2500,1.24
+departamento,04,Arequipa,hogares: factor07 × mieperho (INEI),15.78,1.65,15.77,1421684.0,224404.0,1506,4645,2.36
+departamento,05,Ayacucho,hogares: factor07 × mieperho (INEI),32.76,9.09,33.04,775447.0,254062.0,1160,3308,2.67
+departamento,06,Cajamarca,hogares: factor07 × mieperho (INEI),45.01,19.72,44.99,1554586.0,699671.0,1469,4468,7.36
+departamento,07,Callao,hogares: factor07 × mieperho (INEI),33.86,5.04,33.77,1142618.0,386889.0,1027,3457,4.07
+departamento,08,Cusco,hogares: factor07 × mieperho (INEI),18.54,2.1,18.54,1409467.0,261334.0,1230,3777,2.75
+departamento,09,Huancavelica,hogares: factor07 × mieperho (INEI),33.4,11.16,33.61,543103.0,181415.0,1042,3244,1.91
+departamento,10,Huánuco,hogares: factor07 × mieperho (INEI),38.96,12.2,39.47,926653.0,361048.0,1244,3903,3.8
+departamento,11,Ica,hogares: factor07 × mieperho (INEI),6.01,0.15,5.91,854203.0,51373.0,1500,4838,0.54
+departamento,12,Junín,hogares: factor07 × mieperho (INEI),18.5,3.82,18.61,1450149.0,268269.0,1506,4658,2.82
+departamento,13,La Libertad,hogares: factor07 × mieperho (INEI),30.19,6.56,30.07,2080789.0,628197.0,1509,5028,6.61
+departamento,14,Lambayeque,hogares: factor07 × mieperho (INEI),14.04,0.5,14.05,1349731.0,189511.0,1302,4405,1.99
+departamento,15,Lima,hogares: factor07 × mieperho (INEI),27.07,3.12,26.89,11279909.0,3053352.0,4544,14823,32.11
+departamento,16,Loreto,hogares: factor07 × mieperho (INEI),42.97,14.98,42.61,1129071.0,485191.0,1359,5678,5.1
+departamento,17,Madre de Dios,hogares: factor07 × mieperho (INEI),11.15,1.53,11.14,165992.0,18504.0,603,2045,0.19
+departamento,18,Moquegua,hogares: factor07 × mieperho (INEI),10.97,2.38,10.88,198386.0,21759.0,963,2511,0.23
+departamento,19,Pasco,hogares: factor07 × mieperho (INEI),38.97,8.33,39.28,327776.0,127741.0,865,2746,1.34
+departamento,20,Piura,hogares: factor07 × mieperho (INEI),31.86,4.41,31.81,1988570.0,633578.0,1611,5876,6.66
+departamento,21,Puno,hogares: factor07 × mieperho (INEI),39.94,12.49,40.42,1586886.0,633772.0,1123,3112,6.66
+departamento,22,San Martín,hogares: factor07 × mieperho (INEI),22.02,4.39,21.99,947446.0,208642.0,1347,4619,2.19
+departamento,23,Tacna,hogares: factor07 × mieperho (INEI),23.99,2.65,23.88,380755.0,91339.0,1271,3622,0.96
+departamento,24,Tumbes,hogares: factor07 × mieperho (INEI),26.9,1.06,26.6,261959.0,70470.0,842,2771,0.74
+departamento,25,Ucayali,hogares: factor07 × mieperho (INEI),27.07,3.26,27.12,558484.0,151182.0,1119,4143,1.59
+sexo_jefe_hogar,,Jefe hombre,hogares: factor07 × mieperho (INEI),28.35,6.22,28.3,22799045.0,6464013.0,21640,73855,67.97
+sexo_jefe_hogar,,Jefa mujer,hogares: factor07 × mieperho (INEI),26.07,4.1,26.02,11683654.0,3046132.0,12051,34809,32.03
+sexo,,Hombre,personas residentes: facpob07,27.37,5.37,27.37,16453003.0,4503293.0,29081,52587,47.91
+sexo,,Mujer,personas residentes: facpob07,27.68,5.62,27.68,17694763.0,4897154.0,30152,56077,52.09
+grupo_edad,,0 a 14,personas residentes: facpob07,37.52,8.59,37.52,7941994.0,2979487.0,15368,26489,31.7
+grupo_edad,,15 a 29,personas residentes: facpob07,25.97,4.5,25.97,7512400.0,1950972.0,15681,23122,20.75
+grupo_edad,,30 a 44,personas residentes: facpob07,27.87,5.59,27.87,6689119.0,1863996.0,14791,20648,19.83
+grupo_edad,,45 a 64,personas residentes: facpob07,21.15,3.61,21.15,7803731.0,1650694.0,17596,24735,17.56
+grupo_edad,,65 y más,personas residentes: facpob07,22.74,4.81,22.74,4200522.0,955299.0,10399,13670,10.16
