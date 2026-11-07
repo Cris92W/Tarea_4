@@ -1,8 +1,8 @@
 # Conversación con Claude Code: Parte 2, Skills de la ENAHO
 
 - **Sesión:** `a3e53fdd` · **modelo:** claude-opus-5-5
-- **Desde** 2026-11-07 11:50 **hasta** 2026-11-07 12:38 (hora de Perú)
-- **Mensajes del usuario:** 1 · **herramientas usadas por Claude:** 127
+- **Desde** 2026-11-07 11:50 **hasta** 2026-11-07 13:13 (hora de Perú)
+- **Mensajes del usuario:** 6 · **herramientas usadas por Claude:** 138
 - Exportado con `scripts/exportar_conversacion.py` desde el registro que guarda Claude Code. Incluye cada mensaje, respuesta, herramienta y resultado (los resultados largos se recortan aquí y están completos en `00_conversacion.json`). No incluye el razonamiento interno del modelo ni mensajes internos de Claude Code. Se ocultaron rutas personales, correos, las notas de memoria del asistente y nombres de terceros.
 
 ### 🧑 Usuario · 11:50
@@ -3787,4 +3787,530 @@ Shell cwd was reset to ~\Documents\Diplomado Ciencia de Datos\Python 1\Python 2\
 ```
 
 </details>
+
+**🤖 Claude · 12:38:** Todo se regeneró y las 10 pruebas siguen pasando. Ahora exporto la conversación de las Partes 1 y 2 a `evidencias_ia/` y reviso que no quede ningún dato personal.
+
+<details><summary>🔧 Bash · 12:38</summary>
+
+```bash
+cd "~/Documents/Diplomado Ciencia de Datos/Python 1/Python 2/Tarea_4" && P="<scratchpad>" && S="~/.claude/projects/C--Users-usuario-Documents-Diplomado-Ciencia-de-Datos-Python-1-Python-2-Python-Intermedio/a3e53fdd-9c69-46d6-a6a0-268a06ad4539.jsonl" && uv run --quiet scripts/exportar_conversacion.py "$S" --fase "mcp|Planificación y Parte 1, servidor MCP del BCRP|" --fase "skills|Parte 2, Skills de la ENAHO|avanza la parte 2" --ocultar "$P/t4/ocultar_terceros.txt" 2>&1 | grep -v VIRTUAL_ENV && ls -la evidencias_ia/mcp/00_* evidencias_ia/skills/00_* && echo "=== revisión de datos personales en todo evidencias_ia y el repo (debe dar 0) ===" && grep -r -l -i -E 'usuario|usuario|usuario|unmsm\.edu|@gmail|linkedin\.com/in' --include='*' . --exclude-dir=.venv --exclude-dir=datos --exclude-dir=.git | head; grep -r -l -i -f "$P/t4/ocultar_terceros.txt" . --exclude-dir=.venv --exclude-dir=datos --exclude-dir=.git | head; echo "(fin de la revisión)"
+```
+
+**Resultado:**
+
+```
+mcp: 183 entradas → evidencias_ia/mcp/00_conversacion.md
+skills: 271 entradas → evidencias_ia/skills/00_conversacion.md
+-rw-r--r-- 1 usuario 197121 345854 Nov  7 12:38 evidencias_ia/mcp/00_conversacion.json
+-rw-r--r-- 1 usuario 197121 122985 Nov  7 12:38 evidencias_ia/mcp/00_conversacion.md
+-rw-r--r-- 1 usuario 197121 350372 Nov  7 12:38 evidencias_ia/skills/00_conversacion.json
+-rw-r--r-- 1 usuario 197121 168818 Nov  7 12:38 evidencias_ia/skills/00_conversacion.md
+=== revisión de datos personales en todo evidencias_ia y el repo (debe dar 0) ===
+./evidencias_ia/skills/01_mapa_coordinado.jsonl
+./evidencias_ia/skills/01_mapa_coordinado.md
+./mcp/__pycache__/server.cpython-312.pyc
+./mcp/__pycache__/test_propias.cpython-312-pytest-9.2.0.pyc
+./mcp/__pycache__/test_server.cpython-312-pytest-9.2.0.pyc
+./scripts/__pycache__/exportar_conversacion.cpython-312.pyc
+./scripts/__pycache__/registro.cpython-312.pyc
+(fin de la revisión)
+Shell cwd was reset to ~\Documents\Diplomado Ciencia de Datos\Python 1\Python 2\Python-Intermedio
+```
+
+</details>
+
+<details><summary>🔧 Bash · 12:38</summary>
+
+```bash
+cd "~/Documents/Diplomado Ciencia de Datos/Python 1/Python 2/Tarea_4" && uv run --quiet python -X utf8 -c "
+import json, sys
+sys.path.insert(0, 'scripts')
+from pathlib import Path
+from registro import ocultar_todo, a_markdown
+for f in sorted(Path('evidencias_ia').glob('*/*.jsonl')):
+    lineas = [json.dumps(ocultar_todo(json.loads(l)), ensure_ascii=False) for l in f.read_text(encoding='utf-8').splitlines() if l.strip()]
+    f.write_text('\n'.join(lineas) + '\n', encoding='utf-8')
+    a_markdown(f)
+    print('re-ocultado:', f.as_posix())
+" 2>&1 | grep -v VIRTUAL_ENV && P="<scratchpad>" && echo "=== revisión final (debe quedar vacía) ===" && grep -r -l -i -E 'usuario|usuario|usuario|unmsm\.edu|linkedin\.com/in' . --exclude-dir=.venv --exclude-dir=datos --exclude-dir=.git --exclude-dir=__pycache__; grep -r -l -i -f "$P/t4/ocultar_terceros.txt" . --exclude-dir=.venv --exclude-dir=datos --exclude-dir=.git --exclude-dir=__pycache__; echo "(fin)"
+```
+
+**Resultado:**
+
+```
+re-ocultado: evidencias_ia/mcp/01_inflacion_lima.jsonl
+re-ocultado: evidencias_ia/mcp/02_panel_credito.jsonl
+re-ocultado: evidencias_ia/mcp/03_recursos.jsonl
+re-ocultado: evidencias_ia/mcp/04_prompt_informe.jsonl
+re-ocultado: evidencias_ia/mcp/05_sin_datos.jsonl
+re-ocultado: evidencias_ia/skills/01_mapa_coordinado.jsonl
+re-ocultado: evidencias_ia/skills/02_grafico_area.jsonl
+re-ocultado: evidencias_ia/skills/03_pregunta_cusco.jsonl
+re-ocultado: evidencias_ia/skills/04_invocacion_limpieza.jsonl
+re-ocultado: evidencias_ia/skills/05_invocacion_graficos.jsonl
+re-ocultado: evidencias_ia/skills/06_invocacion_mapa.jsonl
+=== revisión final (debe quedar vacía) ===
+(fin)
+Shell cwd was reset to ~\Documents\Diplomado Ciencia de Datos\Python 1\Python 2\Python-Intermedio
+```
+
+</details>
+
+**🤖 Claude · 12:38:** El repositorio quedó sin datos personales. Verifico también lo que ya subimos a `main` en la Parte 1, por si el nombre de usuario de Windows quedó en el historial público.
+
+<details><summary>🔧 Bash · 12:38</summary>
+
+```bash
+cd "~/Documents/Diplomado Ciencia de Datos/Python 1/Python 2/Tarea_4" && echo "coincidencias en main (ya publicado):" && git grep -c -i -E 'usuario|usuario|usuario' main -- . | head; echo "(fin)"; git diff --stat -- evidencias_ia/mcp | tail -3
+```
+
+**Resultado:**
+
+```
+coincidencias en main (ya publicado):
+(fin)
+ evidencias_ia/mcp/04_prompt_informe.jsonl | 38 +++++++++++++++----------------
+ evidencias_ia/mcp/05_sin_datos.jsonl      | 22 +++++++++---------
+ 5 files changed, 60 insertions(+), 60 deletions(-)
+Shell cwd was reset to ~\Documents\Diplomado Ciencia de Datos\Python 1\Python 2\Python-Intermedio
+```
+
+</details>
+
+<details><summary>🔧 Bash · 12:39</summary>
+
+```bash
+cd "~/Documents/Diplomado Ciencia de Datos/Python 1/Python 2/Tarea_4" && git status --porcelain -uall | grep -v '^ M' | head -60 && echo "--- tamaños ---" && du -sh figuras mapas salidas evidencias_ia .claude 2>/dev/null
+```
+
+**Resultado:**
+
+```
+?? .claude/skills/graficando-enaho/SKILL.md
+?? .claude/skills/graficando-enaho/scripts/graficar.py
+?? .claude/skills/limpiando-enaho/SKILL.md
+?? .claude/skills/limpiando-enaho/reference.md
+?? .claude/skills/limpiando-enaho/scripts/consultar.py
+?? .claude/skills/limpiando-enaho/scripts/descargar.py
+?? .claude/skills/limpiando-enaho/scripts/limpiar.py
+?? .claude/skills/mapeando-enaho/SKILL.md
+?? .claude/skills/mapeando-enaho/scripts/mapear.py
+?? evidencias_ia/mcp/00_conversacion.json
+?? evidencias_ia/mcp/00_conversacion.md
+?? evidencias_ia/skills/00_conversacion.json
+?? evidencias_ia/skills/00_conversacion.md
+?? evidencias_ia/skills/01_mapa_coordinado.jsonl
+?? evidencias_ia/skills/01_mapa_coordinado.md
+?? evidencias_ia/skills/02_grafico_area.jsonl
+?? evidencias_ia/skills/02_grafico_area.md
+?? evidencias_ia/skills/03_pregunta_cusco.jsonl
+?? evidencias_ia/skills/03_pregunta_cusco.md
+?? evidencias_ia/skills/04_invocacion_limpieza.jsonl
+?? evidencias_ia/skills/04_invocacion_limpieza.md
+?? evidencias_ia/skills/05_invocacion_graficos.jsonl
+?? evidencias_ia/skills/05_invocacion_graficos.md
+?? evidencias_ia/skills/06_invocacion_mapa.jsonl
+?? evidencias_ia/skills/06_invocacion_mapa.md
+?? figuras/pobreza_area.csv
+?? figuras/pobreza_area.png
+?? figuras/pobreza_departamento.csv
+?? figuras/pobreza_departamento.png
+?? figuras/pobreza_departamento_piura.csv
+?? figuras/pobreza_departamento_piura.png
+?? figuras/pobreza_dominio.csv
+?? figuras/pobreza_dominio.png
+?? figuras/pobreza_edad.csv
+?? fi
+[… 578 caracteres más en el .json]
+```
+
+</details>
+
+<details><summary>🔧 Bash · 12:39</summary>
+
+```bash
+cd "~/Documents/Diplomado Ciencia de Datos/Python 1/Python 2/Tarea_4" && M="<scratchpad>/t4" && cat > "$M/c1.txt" <<'EOF'
+Parte 2: skill limpiando-enaho con descarga, limpieza, validación y consultas
+
+- descargar.py baja los módulos 34 y 02 de la ENAHO 2024 (código 966) del INEI.
+- limpiar.py lee los .dta con las llaves como texto, normaliza nombres, filtra
+  residentes habituales, une con merge(validate="m:1"), pondera y valida; si una
+  validación esencial falla no guarda la base. 19 de 19 aprobadas: 27.58 %
+  (método del INEI), 27.53 % (facpob07), 108 664 residentes, 25 departamentos.
+- consultar.py calcula la pobreza ponderada de cualquier grupo con la
+  ponderación que corresponde a su unidad de análisis.
+- SKILL.md y reference.md; salidas/validacion.txt e indicadores.csv.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+EOF
+cat > "$M/c2.txt" <<'EOF'
+Parte 2: skills graficando-enaho y mapeando-enaho, con figuras y mapa
+
+- graficar.py: pobreza total y extrema por área, sexo, edad, depart
+[… 1574 caracteres más en el .json]
+```
+
+**Resultado:**
+
+```
+warning: in the working copy of 'pyproject.toml', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'uv.lock', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/skills/limpiando-enaho/SKILL.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/skills/limpiando-enaho/reference.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/skills/limpiando-enaho/scripts/consultar.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/skills/limpiando-enaho/scripts/descargar.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/skills/limpiando-enaho/scripts/limpiar.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/skills/graficando-enaho/SKILL.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/skills/mapeando-enaho/SKILL.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/espacio_limpio.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/exportar_conversacion.py', LF will be replaced by CRLF the next time Git touches it
+## parte-2
+* cf16047 Parte 2: demostraciones de las Skills, conversaciones exportadas y 
+[… 670 caracteres más en el .json]
+```
+
+</details>
+
+<details><summary>🔧 Edit · 12:39</summary>
+
+Archivo: `None`
+
+Antes:
+```
+
+```
+Después:
+```
+
+```
+
+**Resultado:**
+
+```
+[omitido: notas de memoria del asistente, con datos de otras tareas y personales]
+```
+
+</details>
+
+<details><summary>🔧 Edit · 12:39</summary>
+
+Archivo: `None`
+
+Antes:
+```
+
+```
+Después:
+```
+
+```
+
+**Resultado:**
+
+```
+[omitido: notas de memoria del asistente, con datos de otras tareas y personales]
+```
+
+</details>
+
+**🤖 Claude · 12:39:** La Parte 2 está terminada y verificada, en la rama local `parte-2` (3 commits). No subí nada: cuando me digas «merge», la uno a `main` y la subo.
+
+| Criterio de la rúbrica (6 pts) | Qué hay |
+|---|---|
+| Limpieza, ponderación y validación (2.5) | `limpiando-enaho`: descarga los módulos 34 y 02, filtra residentes, une con `validate="m:1"` y se detiene si falla una validación esencial. Pasaron las **19 de 19** validaciones: 27.58 % de pobreza nacional (método del INEI) y 27.53 % con `facpob07`, 108,664 residentes, 25 departamentos |
+| Gráficos (1.5) | `graficando-enaho`: 6 gráficos ponderados (área, sexo, edad, departamentos, Piura resaltado y dominios), con título que dice el hallazgo, unidad, año y fuente, y un CSV con las cifras de cada uno |
+| Mapa (1.5) | `mapeando-enaho`: une por código (`ubigeo[:2]` = `FIRST_IDDP`), 25 de 25 departamentos, Lima y Callao separados. Respecto de la referencia de la sesión 16, la diferencia máxima es **0.05 puntos** |
+| Activación y coordinación (0.5) | Con el pedido del issue, «Haz un mapa de la pobreza…», Claude Code activó solo `limpiando-enaho` y luego `mapeando-enaho`. Hay 6 corridas guardadas, incluida la invocación directa de cada skill |
+
+**Un hallazgo para tu informe:** las referencias del curso (24.8 urbano, 39.3 rural y los valores por departamento) se calcularon con el método del INEI, no con `facpob07`. Por eso uso el método del INEI para territorios y `facpob07` solo para rasgos de la persona (sexo y edad). Está documentado en el README.
+
+**Evidencias (Opción B):** ya exporté la conversación de las Partes 1 y 2 a `evidencias_ia/mcp/` y `evidencias_ia/skills/`, en Markdown y JSON. Revisé que no quedaran tu correo, tu usuario de Windows, mis notas de otras tareas ni nombres de compañeros.
+
+**Un incidente:** una protección del sistema bloqueó que yo borrara salidas para probar desde cero. No intenté saltármela: las pruebas corren en copias limpias del proyecto. No tienes que hacer nada al respecto.
+
+**Para seguir necesito dos cosas:**
+1. Que revises la carpeta `Tarea_4` y me digas «merge».
+2. **La pregunta de investigación para la Parte 3.** Es lo único que bloquea el avance:
+   - **A (la recomiendo):** pobreza 2024 frente a crédito por habitante, comparando los 25 departamentos (2020–2024). El MCP ya tiene la herramienta `panel_departamental` pensada para esto.
+   - **B:** Niño Costero 2023, actividad económica e inflación, con foco en Piura.
+   - **C:** el ejemplo del profesor, inflación 2020–2024 y diferencias territoriales de la pobreza.
+
+### 🧑 Usuario · 12:41
+
+> como planteas que sea la pregunta de investigacion si fuera la opcion A?
+
+**🤖 Claude · 12:42:** Antes de proponerte la redacción, compruebo con los datos que la pregunta A da para algo. Cruzo de forma preliminar el crédito por habitante (BCRP, con la herramienta del MCP) con la pobreza por departamento (ENAHO, con la base que ya armó la skill).
+
+<details><summary>🔧 Bash · 12:42</summary>
+
+```bash
+cat > "<scratchpad>/t4/viabilidad_a.py" <<'EOF'
+"""Chequeo de viabilidad de la pregunta A (no es parte del entregable)."""
+import asyncio, sys
+from pathlib import Path
+import pandas as pd
+raiz = Path(sys.argv[1]); sys.path.insert(0, str(raiz / "mcp"))
+from fastmcp import Client
+from server import mcp
+
+async def llamar(nombre, **args):
+    async with Client(mcp) as c:
+        return (await c.call_tool(nombre, args)).data
+
+ind = pd.read_csv(raiz / "salidas/indicadores.csv", dtype={"codigo": str})
+dep = ind[ind.nivel == "departamento"][["codigo", "categoria", "pobreza_pct", "poblacion"]].rename(columns={"codigo": "ccdd"})
+for indicador in ["credito directo", "depositos"]:
+    r = asyncio.run(llamar("panel_departamental", indicador=indicador, anio=2024, anio_base=2020))
+    p = pd.DataFrame(r["departamentos"])[["ccdd", "valor", "valor_base", "variacion_pct"]]
+    d = dep.merge(p, on="ccdd")
+    d["per_capita_soles"] = d.valor * 1e6 / d.poblacion
+    rho = d[["pobreza_pct", "per_capita_soles"]].corr(method="spearman").i
+[… 1563 caracteres más en el .json]
+```
+
+**Resultado:**
+
+```
+== Crédito directo del sistema financiero al sector privado por (millones S/), 2024 | total nacional 407352, var 2020-24 10.1 %
+Spearman pobreza vs credito directo por habitante: -0.60 (sin Lima y Callao: -0.72); pobreza vs crecimiento nominal 2020-24: 0.21
+categoria  pobreza_pct  per_capita_soles  variacion_pct
+     Lima         27.1           26460.5           11.0
+ Arequipa         15.8           10076.6            9.7
+      Ica          6.0            7422.7            7.4
+    Tacna         24.0            6992.9           -9.5
+...
+   categoria  pobreza_pct  per_capita_soles  variacion_pct
+Huancavelica         33.4            1180.2           49.3
+      Loreto         43.0            2080.5           14.5
+    Amazonas         25.8            2434.5           43.6
+    Ayacucho         32.8            2607.4           18.7
+Piura: [{'pobreza_pct': 31.9, 'per_capita_soles': 4550.6, 'variacion_pct': 4.9}]
+
+== Depósitos en el sistema financiero por departamentos - fin d (millones S/), 2024 | total nacional 413174, var 2020-24 13.5 %
+Spearman pobreza vs depositos por habitante: -0.53 (sin Lima y Callao: -0.71); pobreza vs crecimiento nominal 2020-24: -0.14
+categoria  pobreza_pct  per_capita_soles  variacion_pct
+     Lima         27.1           28115.8           10.0
+ Arequipa         15.8           12123.1           28.8
+   Callao         33.9            9207.4           55.1
+ Moquegua         11.0            8148.5           22.8
+...
+   categoria  pobreza_pct  per_capita_soles 
+[… 489 caracteres más en el .json]
+```
+
+</details>
+
+**🤖 Claude · 12:43:** Te propongo esta formulación. La revisé con datos reales antes de proponerla: da una respuesta con contenido y se puede responder con las dos fuentes al mismo nivel territorial.
+
+## Pregunta de investigación (opción A)
+
+> **¿Qué relación hay entre la pobreza monetaria de 2024 y el crédito del sistema financiero por habitante en los 25 departamentos del Perú, y cómo evolucionó ese crédito en términos reales entre 2020 y 2024?**
+
+**Objetivo:** describir si los departamentos más pobres son también los que menos acceso tienen al crédito, y si esa brecha se cerró o se amplió en el período. Es una asociación descriptiva, no una relación de causa.
+
+**Delimitación:**
+
+| | Fuente y herramienta |
+|---|---|
+| **Unidad:** los 25 departamentos, con Lima y Callao separados | Se unen por el código INEI en las dos fuentes |
+| **Pobreza monetaria 2024** (método del INEI) | ENAHO, con las Skills `limpiando-enaho` y `mapeando-enaho` |
+| **Crédito directo por habitante, 2020 y 2024** | BCRP vía MCP (`panel_departamental`), dividido entre la población que estima la ENAHO |
+| **Crecimiento real del crédito** | Se descuenta la inflación con el índice de precios al consumidor (IPC) del BCRP, usando `buscar_series` y `resumen` del MCP |
+
+**Subpreguntas que guiarían el informe:**
+1. ¿Qué tan desigual es el crédito por habitante entre departamentos?
+2. ¿Dónde se concentra la pobreza en 2024?
+3. ¿Se mueven juntas las dos variables?
+4. ¿Creció más el crédito donde hay más pobreza?
+5. ¿Dónde queda Piura? (opcional, como continuidad de tu Tarea 3)
+
+## Por qué vale la pena (cálculos preliminares, no son el resultado final)
+
+- **Asociación negativa clara:** a más crédito por habitante, menos pobreza. La correlación de rangos es de −0.60, y de −0.72 sin Lima y Callao.
+- **Brecha de 22 veces:** Lima tiene unos S/ 26,500 de crédito por habitante y Huancavelica unos S/ 1,200.
+- **Caída en términos reales:** entre 2020 y 2024 el crédito nacional creció 10.1 % en soles corrientes, pero los precios subieron 21.5 %.
+- **Piura:** 31.9 % de pobreza, unos S/ 4,550 de crédito por habitante, y su crédito creció solo 4.9 % en soles corrientes.
+
+En la Parte 3 el agente recalcula todo esto en una corrida documentada. Estas cifras solo prueban que la pregunta funciona.
+
+## Limitaciones que el informe reconocerá
+
+- Con 25 departamentos, una asociación territorial no dice nada sobre lo que pasa en cada hogar, y no prueba causa.
+- Lima concentra cerca del 73 % del crédito. Puede influir dónde se registran las operaciones; lo voy a verificar en la nota metodológica del BCRP.
+- Los años y las fuentes son distintos: el crédito es un saldo a fin de año y la pobreza viene de una encuesta con error muestral. Además, el IPC de Lima se usa como aproximación de los precios nacionales.
+
+**Versión más corta**, si la prefieres para el comentario de entrega:
+> *¿Hay menos crédito donde hay más pobreza? Pobreza monetaria (ENAHO 2024) y crédito por habitante (BCRP, 2020–2024) en los 25 departamentos del Perú.*
+
+¿La dejamos así, o quieres el foco en Piura dentro de la pregunta principal? Con tu respuesta arranco la Parte 3.
+
+### 🧑 Usuario · 12:57
+
+> ¿Hay menos crédito donde hay más pobreza? Pobreza monetaria (ENAHO 2024) y crédito por habitante (BCRP, 2020–2024) en los 25 departamentos del Perú. me gusta eso, pero basicamente esta tarea que es lo que busca?
+
+<details><summary>🔧 Edit · 12:58</summary>
+
+Archivo: `None`
+
+Antes:
+```
+
+```
+Después:
+```
+
+```
+
+**Resultado:**
+
+```
+[omitido: notas de memoria del asistente, con datos de otras tareas y personales]
+```
+
+</details>
+
+<details><summary>🔧 Edit · 12:58</summary>
+
+Archivo: `None`
+
+Antes:
+```
+
+```
+Después:
+```
+
+```
+
+**Resultado:**
+
+```
+[omitido: notas de memoria del asistente, con datos de otras tareas y personales]
+```
+
+</details>
+
+**🤖 Claude · 12:58:** Queda esa pregunta, tal como la escribiste. Sobre qué busca la tarea:
+
+## En una frase
+
+Que construyas una IA que **no responda de memoria, sino con herramientas**, y que **demuestres** que sus respuestas son correctas, verificables y reproducibles por otra persona.
+
+El issue lo dice así: *«El objetivo no es construir un chatbot que responda con su conocimiento previo, sino un sistema que utilice herramientas especializadas para producir respuestas verificables y reproducibles.»*
+
+## Qué evalúa en el fondo
+
+| Lo que el profesor quiere ver | Cómo se prueba | Puntos | Estado |
+|---|---|---|---|
+| **Que sepas darle herramientas confiables a la IA**: las cuentas las hace el código, no el modelo | Servidor MCP del BCRP con pruebas automáticas | 5 | ✅ Parte 1 |
+| **Que trabajes los datos con rigor**: ponderación, uniones por código y cifras que cuadran con las oficiales | Skills de la ENAHO que validan 27.6 %, 108,664 residentes y 25 departamentos | 6 | ✅ Parte 2 |
+| **Que la IA combine sola las dos fuentes** para responder una pregunta real | Una ejecución donde Claude Code usa el MCP y las Skills juntos y escribe el informe; tú compruebas 3 cifras a mano | 5 | Parte 3 |
+| **Que midas si las herramientas mejoran las respuestas** | 10 preguntas respondidas sin y con MCP/Skills, comparando aciertos y tiempos | 4 | Parte 4 |
+
+Además se fija en la honestidad: si una herramienta falla, la IA debe decirlo y no inventar, y el informe no debe presentar asociaciones como causas. También en la transparencia: README, comandos y evidencias del uso de IA.
+
+## Qué lugar ocupa tu pregunta
+
+Tu pregunta es el **vehículo** para demostrar que el agente funciona, no una tesis. Directamente vale 0.5 puntos («pregunta pertinente y planificación coherente»). Pero cumple el requisito clave: no se puede responder sin las dos fuentes, porque el crédito viene del BCRP y la pobreza y la población de la ENAHO.
+
+## Lo que falta
+
+- **Parte 3:** en una sola corrida documentada, Claude Code planifica, saca el crédito por departamento con el MCP y el IPC del BCRP para descontar la inflación, corre las Skills de la ENAHO y escribe `informe_final.md`. El informe lleva 3 hallazgos, un gráfico del BCRP, uno de la ENAHO y el mapa. Después **tú compruebas 3 cifras** en las webs del BCRP y del INEI; te preparo los enlaces y toma unos 15 minutos.
+- **Parte 4:** las 10 preguntas con respuestas verificadas, las corridas sin y con herramientas, y la comparación.
+- **Cierre:** README final, evidencias y el texto del comentario de entrega.
+
+¿Avanzo con la Parte 3? Y cuando hayas revisado la Parte 2, dime «merge» para subirla.
+
+### 🧑 Usuario · 13:03
+
+> esa pregunta es para la parte 3?
+
+**🤖 Claude · 13:04:** Sí, es para la Parte 3. Es su primer paso, «Formulación de la pregunta de investigación», y todo lo demás de esa parte gira en torno a ella. El agente la recibe, planifica, consulta el BCRP por el MCP, procesa la ENAHO con las Skills y escribe `informes/informe_final.md` para responderla.
+
+La pregunta también aparece en otros tres lugares:
+- en el comentario de entrega del issue #201, en el campo «Pregunta de investigación»;
+- en el README, en el objetivo;
+- en el informe final, en la primera sección.
+
+Las Partes 1 y 2 no dependen de ella: son las herramientas, y ya están hechas. La Parte 4 tiene sus propias 10 preguntas de evaluación, cada una con una respuesta numérica verificable, como «¿cuál fue la pobreza en Cusco en 2024?». Dos de ellas tienen que combinar BCRP y ENAHO, y esas sí pueden inspirarse en tu tema.
+
+¿Avanzo con la Parte 3?
+
+### 🧑 Usuario · 13:07
+
+> pero o crees que esa pregunta es mas como un titular de un web para atraer lectores que ser una rigurosa pregunta de investigacion?
+
+**🤖 Claude · 13:07:** Sí, tienes razón. Funciona como titular, pero como pregunta de investigación le falta rigor:
+
+| Problema | En la frase actual |
+|---|---|
+| **Tono periodístico** | «¿Hay menos crédito donde hay más pobreza?» llama la atención, pero no dice qué tipo de relación se estudia. Suena a causa y efecto, cuando lo que se puede medir es una asociación |
+| **Variables sin definir** | ¿Qué crédito: total, por habitante, saldo a fin de año? ¿Qué pobreza: monetaria, extrema? |
+| **La segunda parte no es pregunta** | «Pobreza monetaria (ENAHO 2024)…» es un subtítulo descriptivo |
+| **2020–2024 sin propósito** | Aparece el período, pero no se pregunta qué se quiere saber de él |
+
+Te propongo separar las dos cosas:
+
+**Título del informe** (el gancho, para el lector):
+> ¿Hay menos crédito donde hay más pobreza?
+
+**Pregunta de investigación** (para la Parte 3, el informe y la entrega):
+> **¿Qué grado de asociación existe, entre los 25 departamentos del Perú, entre la incidencia de la pobreza monetaria en 2024 (ENAHO) y el crédito directo del sistema financiero por habitante (BCRP), y cómo varió ese crédito en términos reales entre 2020 y 2024 según el nivel de pobreza de cada departamento?**
+
+Por qué esta sí es rigurosa:
+- **Tipo de estudio:** correlacional y descriptivo, a nivel de departamento. No promete causa.
+- **Unidad:** los 25 departamentos, con Lima y Callao separados.
+- **Variables operacionalizadas:**
+  - incidencia de pobreza monetaria (% de la población, método del INEI);
+  - crédito por habitante: saldo a fin de año en soles entre la población estimada por la ENAHO. Es un indicador de *profundización financiera*, un concepto con literatura detrás.
+- **Dimensión temporal:** variación real 2020–2024, descontando la inflación con el IPC del BCRP.
+
+**Preguntas específicas**, que ordenan el informe y los 3 hallazgos:
+1. ¿Cómo se distribuyen la pobreza 2024 y el crédito por habitante entre los departamentos?
+2. ¿Qué signo y magnitud tiene la asociación entre ambos (correlación de rangos de Spearman), con y sin Lima y Callao?
+3. ¿Creció más o menos el crédito real en los departamentos más pobres?
+
+**Hipótesis descriptiva:** los departamentos con más pobreza tienen menos crédito por habitante. La pregunta 1 de arriba se puede contrastar con los datos, y si el resultado sale al revés, el informe lo dice.
+
+Una limitación que va desde ya en el informe: deflacto con el IPC de Lima para todos los departamentos. Eso cambia los niveles del crecimiento, pero no el orden entre departamentos.
+
+¿Usamos esta versión rigurosa como pregunta oficial y la tuya como título del informe?
+
+### 🧑 Usuario · 13:12
+
+> Me gusta la pregunta dle informe que es gancho, sobre la pregunta de investigacion yo lo podrnia de esta manera:
+> ▎ ¿Qué grado entre la incidencia de la pobreza monetaria en 2024 y el crédito directo del sistema financiero por habitante, y cómo varió ese crédito en términos reales entre 2020 y 2024 según el nivel de pobreza de cada departamento en el Perú?
+
+<details><summary>🔧 Edit · 13:13</summary>
+
+Archivo: `None`
+
+Antes:
+```
+
+```
+Después:
+```
+
+```
+
+**Resultado:**
+
+```
+[omitido: notas de memoria del asistente, con datos de otras tareas y personales]
+```
+
+</details>
+
+**🤖 Claude · 13:13:** Tu versión funciona: es más directa y conserva todo lo esencial. Solo le falta una palabra para que sea gramatical, porque «¿Qué grado entre…?» queda sin sustantivo. Con el mínimo cambio:
+
+> **¿Qué grado de asociación hay entre la incidencia de la pobreza monetaria en 2024 y el crédito directo del sistema financiero por habitante, y cómo varió ese crédito en términos reales entre 2020 y 2024 según el nivel de pobreza de cada departamento en el Perú?**
+
+El resto queda exactamente como lo escribiste. Que las fuentes no aparezcan en la pregunta está bien: van en la delimitación del informe (pobreza de la ENAHO 2024, crédito del BCRP, población estimada con la ENAHO). Y como cierras con «cada departamento en el Perú», se entiende que la comparación es entre departamentos.
+
+Así quedaría:
+- **Título del informe:** ¿Hay menos crédito donde hay más pobreza?
+- **Pregunta de investigación:** la de arriba.
+
+¿Te parece bien con «de asociación hay»? Si me confirmas, empiezo la Parte 3 con esta pregunta.
 

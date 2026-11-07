@@ -6,8 +6,8 @@ Tarea 4 del curso Python Intermedio ([issue #201](https://github.com/d2cml-ai/Da
 Claude Code coordina un servidor MCP con las series del BCRP y tres Skills que procesan la ENAHO 2024 del INEI, y
 responde preguntas con cifras que se pueden rastrear y reproducir.
 
-> **Estado:** Partes 1 (servidor MCP del BCRP), 2 (Skills de la ENAHO) y 3 (agente e informe) terminadas. La
-> Parte 4 (evaluación) se completa en la siguiente entrega.
+> **Estado:** las cuatro partes están terminadas: servidor MCP del BCRP, Skills de la ENAHO, agente con su informe y
+> evaluación. **Informe final:** [`informes/informe_final.md`](informes/informe_final.md).
 
 ## 1. Objetivo del proyecto
 
@@ -186,9 +186,46 @@ uv run scripts/espacio_limpio.py ../copia_limpia
 uv run scripts/registro.py correr evidencias_ia/skills/01_mapa_coordinado "Haz un mapa de la pobreza monetaria por departamento con ENAHO 2024." --skills --herramientas "Skill,Bash,Read,Glob,Grep" --permitidas "Bash,Read,Glob,Grep" --cwd ../copia_limpia
 ```
 
+La investigación de la Parte 3 y la evaluación de la Parte 4:
+
+```bash
+# el agente completo: MCP + Skills en una copia limpia
+uv run scripts/espacio_limpio.py ../copia_agente
+uv run scripts/registro.py correr evidencias_ia/integracion/05_ejecucion_agente "$(cat informes/prompt_investigacion.md)" --mcp --skills --herramientas "Skill,Bash,Read,Write,Edit,Glob,Grep,WebFetch" --permitidas "Bash,Read,Write,Edit,Glob,Grep,WebFetch" --cwd ../copia_agente
+uv run scripts/verificar_cifras.py                          # recálculo independiente de 7 cifras del informe
+
+# evaluación: respuestas esperadas, 20 ejecuciones (modos A y B) y calificación
+uv run evaluacion/respuestas_esperadas.py
+uv run evaluacion/evaluar.py --trabajo ../evaluacion_trabajo
+uv run evaluacion/calificar.py
+```
+
+En Windows, las carpetas de trabajo deben ir en una ruta sin nombres cortos (`…~1`) y no muy larga.
+
 ## 9. Resultados de la evaluación
 
-*Parte 4.*
+Diez preguntas con respuesta verificable ([`evaluacion/preguntas.csv`](evaluacion/preguntas.csv)): 4 del BCRP, 4 de
+la ENAHO y 2 que combinan ambas. Las respuestas esperadas se calcularon sin el código evaluado (el BCRP directo de su
+API y la ENAHO directo del archivo del INEI) y quedaron en el commit `35151e1` antes de correr. Cada pregunta se hizo
+dos veces a Claude Code (Sonnet), en sesiones independientes y con la misma instrucción:
+
+- **Modo A:** sin MCP ni Skills, solo con búsqueda web, en una carpeta vacía.
+- **Modo B:** con el MCP `bcrp` y las Skills, en una copia limpia del proyecto sin salidas.
+
+| Modo | Correctas | Incorrectas | Sin respuesta | Segundos en promedio |
+|---|---:|---:|---:|---:|
+| A: sin MCP ni Skills | 6 | 2 | 2 | 26.9 |
+| B: con MCP y Skills | 10 | 0 | 0 | 20.6 |
+
+Mejoraron cuatro preguntas y ninguna empeoró:
+
+- **b3 y b4:** el modo A dio una estimación de crecimiento del PBI que ya no es la vigente y una cifra de crédito de
+  otra publicación.
+- **e3 y c2:** son indicadores que hay que calcular con los microdatos; el modo A respondió «no sé» en vez de inventar.
+
+Una calificación se corrigió a mano, con su motivo en
+[`evaluacion/revision_manual.csv`](evaluacion/revision_manual.csv). Análisis completo:
+[`evaluacion/comparacion.md`](evaluacion/comparacion.md); datos: [`evaluacion/resultados.csv`](evaluacion/resultados.csv).
 
 ## 10. Limitaciones y problemas encontrados
 
@@ -278,10 +315,12 @@ Todo está en [`evidencias_ia/`](evidencias_ia/), sin rutas personales ni correo
 | [`mcp/`](evidencias_ia/mcp/) | `pruebas.txt` (10 passed, con la verificación de que `test_server.py` es idéntico al del curso) y 5 ejecuciones de Claude Code con el MCP: herramientas, herramienta propia, recursos, prompt y una consulta sin datos |
 | [`skills/`](evidencias_ia/skills/) | 6 ejecuciones de Claude Code con las Skills: el mapa pedido en lenguaje natural que activa limpieza y mapa en cadena, un gráfico y una pregunta en lenguaje natural, y la invocación directa de cada Skill con `/nombre` |
 | [`integracion/`](evidencias_ia/integracion/) | La ejecución completa del agente ([`05_ejecucion_agente.md`](evidencias_ia/integracion/05_ejecucion_agente.md)), los tres intentos anteriores en los que el agente informó el error sin inventar, y la prueba de manejo de errores con un año sin datos de la ENAHO |
-| `evaluacion/` | *Parte 4* |
+| [`evaluacion/`](evidencias_ia/evaluacion/) | Las 20 ejecuciones de la evaluación (`<pregunta>_<modo>`): pregunta, herramientas usadas, resultado de cada una y respuesta final |
 
-**Conversaciones de desarrollo (Opción B, exportación).** Cada carpeta tiene `00_conversacion.md` (legible) y
-`00_conversacion.json` (completo) con la conversación con Claude Code de esa etapa: cada mensaje, respuesta,
-herramienta y resultado. Se exportaron con `scripts/exportar_conversacion.py` desde el registro que guarda Claude
-Code, sin el razonamiento interno del modelo y sin datos personales (rutas, nombre de usuario, correos, notas de
-memoria del asistente sobre otras tareas y nombres de terceros).
+**Conversaciones de desarrollo (Opción B, exportación).** `mcp/`, `skills/` e `integracion/` tienen
+`00_conversacion.md` (legible) y `00_conversacion.json` (completo) con la conversación con Claude Code de cada etapa:
+cada mensaje, respuesta, herramienta y resultado. La de `integracion/` incluye también el desarrollo de la
+evaluación, que se hizo en la misma conversación. Se exportaron con `scripts/exportar_conversacion.py` desde el
+registro que guarda Claude Code, sin el razonamiento interno del modelo y sin datos personales (rutas, nombre de
+usuario, correos, notas de memoria del asistente sobre otras tareas y nombres de terceros). El índice está en
+[`evidencias_ia/README.md`](evidencias_ia/README.md).
