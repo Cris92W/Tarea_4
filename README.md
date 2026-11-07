@@ -6,8 +6,8 @@ Tarea 4 del curso Python Intermedio ([issue #201](https://github.com/d2cml-ai/Da
 Claude Code coordina un servidor MCP con las series del BCRP y tres Skills que procesan la ENAHO 2024 del INEI, y
 responde preguntas con cifras que se pueden rastrear y reproducir.
 
-> **Estado:** Parte 1 (servidor MCP del BCRP) y Parte 2 (Skills de la ENAHO) terminadas. Las Partes 3 y 4 se
-> completan en las siguientes entregas.
+> **Estado:** Partes 1 (servidor MCP del BCRP), 2 (Skills de la ENAHO) y 3 (agente e informe) terminadas. La
+> Parte 4 (evaluación) se completa en la siguiente entrega.
 
 ## 1. Objetivo del proyecto
 
@@ -22,7 +22,7 @@ flowchart LR
     P["Pregunta en lenguaje natural"] --> C["Claude Code<br/>(el agente)"]
     C -- "herramientas MCP" --> M["mcp/server.py<br/>servidor bcrp"]
     M -- "API pública" --> B[("BCRP<br/>17 mil series")]
-    C -- "Skills" --> S["limpiando-enaho<br/>graficando-enaho<br/>mapeando-enaho"]
+    C -- "Skills" --> S["limpiando-enaho<br/>graficando-enaho<br/>mapeando-enaho<br/>cruzando-bcrp-enaho"]
     S -- "scripts de Python" --> E[("INEI<br/>ENAHO 2024")]
     M --> O["salidas/ · figuras/ · mapas/"]
     S --> O
@@ -34,6 +34,8 @@ flowchart LR
 | Servidor MCP `bcrp` | `mcp/server.py` | Busca, descarga y resume series del BCRP; compara los 25 departamentos |
 | Configuración MCP | `.mcp.json` | Conecta el servidor a Claude Code (alcance de proyecto) |
 | Skills de la ENAHO | `.claude/skills/` | Limpian y validan los módulos 34 y 02, grafican y mapean la pobreza ponderada |
+| Skill de cruce | `.claude/skills/cruzando-bcrp-enaho/` | Une un indicador del BCRP (guardado por el MCP) con la pobreza de la ENAHO por código del INEI y mide su asociación |
+| Pregunta al agente | `informes/prompt_investigacion.md` | La instrucción con la que Claude Code hizo la investigación de la Parte 3 |
 | Registro de ejecuciones | `scripts/registro.py` | Corre `claude -p` y guarda cada llamada a herramientas como evidencia |
 | Copia limpia | `scripts/espacio_limpio.py` | Copia el proyecto sin salidas, para correr a Claude Code desde cero |
 | Exportar conversaciones | `scripts/exportar_conversacion.py` | Pasa la sesión de Claude Code a Markdown y JSON, sin datos personales |
@@ -46,7 +48,7 @@ El servidor parte del proyecto de la [Sesión 04](https://github.com/d2cml-ai/Da
 | Herramienta | Qué hace | Ejemplo de argumentos |
 |---|---|---|
 | `buscar_series` | Busca entre las 17 167 series del catálogo del BCRP por palabras clave | `texto="ipc 12 meses"` |
-| `serie` | Descarga los datos de una serie entre dos fechas (diaria, mensual, trimestral o anual), sin los «n.d.», con el enlace a la API y a la tabla web del BCRP | `codigo="PN01273PM", desde="2024-01", hasta="2024-12"` |
+| `serie` | Descarga los datos de una serie entre dos fechas (diaria, mensual, trimestral o anual), sin los «n.d.», con el enlace a la API y a la tabla web del BCRP; con `guardar=True` los deja en `salidas/bcrp/` como CSV para otro script | `codigo="PN01273PM", desde="2024-01", hasta="2024-12"` |
 | `resumen` | Primero, último, cambio, variación %, promedio, máximo y mínimo con su periodo; las cuentas las hace Python | `codigo="PN01273PM", desde="2020-01", hasta="2024-12"` |
 | **`panel_departamental`** (propia) | Trae un indicador anual del BCRP para los **25 departamentos** con el **código del INEI** (`ccdd`, el mismo de `ubigeo[:2]` en la ENAHO y de `FIRST_IDDP` en el mapa), con puesto, variación entre dos años, total nacional, promedio, mediana y extremos; puede guardar la tabla en `salidas/bcrp/` para unirla con la ENAHO sin copiar cifras a mano | `indicador="credito directo", anio=2024, anio_base=2020` |
 
@@ -107,6 +109,13 @@ en una copia del proyecto sin salidas, Claude Code activó `mapeando-enaho`, vio
 Los demás gráficos: [sexo](figuras/pobreza_sexo.png), [edad](figuras/pobreza_edad.png),
 [departamentos](figuras/pobreza_departamento.png) (y [con Piura resaltado](figuras/pobreza_departamento_piura.png)),
 [dominios](figuras/pobreza_dominio.png).
+
+**Una cuarta Skill para integrar las fuentes: `cruzando-bcrp-enaho`.** Recibe el panel departamental que guarda el MCP
+(`panel_departamental(..., guardar=True)`), un índice de precios guardado con `serie(..., guardar=True)` y los
+indicadores de la ENAHO, y los une por el código del INEI. Calcula el indicador por habitante con la población que
+estima la ENAHO, su variación nominal y real, la correlación de Spearman con la pobreza (con un valor p por
+permutación, con y sin Lima y Callao) y los terciles de pobreza, y dibuja la variación real por departamento y la
+dispersión frente a la pobreza. Entre el MCP y las Skills pasan archivos, no cifras copiadas a mano.
 
 ## 5. Fuentes y descarga de los datos
 
@@ -202,14 +211,63 @@ uv run scripts/registro.py correr evidencias_ia/skills/01_mapa_coordinado "Haz u
   pruebas corren en una copia limpia del proyecto (`scripts/espacio_limpio.py`), que además impide leer resultados
   previos.
 - En el mapa, las etiquetas de Lambayeque, Moquegua y Huancavelica rozan los bordes; se leen bien.
+- **Windows y las rutas largas.** Una ruta de más de 260 caracteres hizo fallar al MCP al guardar el panel; ahora el
+  archivo lleva un nombre corto. Claude Code tampoco deja escribir sin aprobación en rutas con el nombre corto de
+  Windows (`…~1`), así que las copias de trabajo usan la ruta larga.
+- **Un empate por redondeo.** La skill de cruce usa la pobreza redondeada a 2 decimales, que empata a Lima y Ucayali
+  (27.07 %): la correlación da −0.604 en vez de −0.609 sin redondear. La conclusión no cambia.
+- **El crédito por departamento** se asigna según el criterio de la SBS, fuente del BCRP, que no se verificó; Lima
+  concentra el 73 %. El crédito directo incluye empresas y personas: no mide el acceso de los hogares pobres.
+- **Primer informe con un error.** Una corrida anterior escribió que Piura era la «3.ª mayor caída real» entre los
+  departamentos de pobreza alta, cuando es la 2.ª. Se corrigió la instrucción: toda cifra o puesto que no esté en un
+  archivo de salida debe calcularse con un comando. El informe final calcula los puestos así.
 
-## 11. Ejemplo de una ejecución completa
+## 11. Ejemplo de una ejecución completa (Parte 3)
 
-*Parte 3. Por ahora, una consulta al MCP desde Claude Code:*
-[`evidencias_ia/mcp/01_inflacion_lima.md`](evidencias_ia/mcp/01_inflacion_lima.md). Claude buscó la serie
-(`buscar_series`), pidió el dato de diciembre (`serie`) y el resumen 2020–2024 (`resumen`), y respondió: inflación de
-Lima a 12 meses de 1.97 % en diciembre de 2024, promedio de 4.47 % y máximo de 8.81 % en junio de 2022 (serie
-PN01273PM), con los enlaces a la API y a la tabla del BCRP.
+**Título del informe:** ¿Hay menos crédito donde hay más pobreza?
+
+**Pregunta de investigación:** ¿Qué grado de asociación hay entre la incidencia de la pobreza monetaria en 2024 y el
+crédito directo del sistema financiero por habitante, y cómo varió ese crédito en términos reales entre 2020 y 2024
+según el nivel de pobreza de cada departamento en el Perú?
+
+Claude Code (Sonnet) recibió la instrucción de [`informes/prompt_investigacion.md`](informes/prompt_investigacion.md)
+en una copia limpia del proyecto, sin ninguna salida previa, y en **una sola ejecución**
+([registro completo](evidencias_ia/integracion/05_ejecucion_agente.md)):
+
+1. Escribió el plan de análisis ([`informes/plan_analisis.md`](informes/plan_analisis.md)).
+2. Activó las **4 Skills** con la herramienta `Skill`: `limpiando-enaho` (base y 19 validaciones), `graficando-enaho`
+   (pobreza por departamento), `mapeando-enaho` (mapa) y `cruzando-bcrp-enaho` (el cruce).
+3. Usó **3 herramientas distintas del MCP**: `panel_departamental` (crédito de los 25 departamentos, 2020 y 2024),
+   `buscar_series` (encontrar el índice de precios) y `serie` (el IPC de dic-2020 a dic-2024), guardando los datos
+   como archivos para el cruce.
+4. Contrastó cifras del BCRP en su tabla web (WebFetch) y la ENAHO con la cifra oficial del INEI.
+5. Escribió [`informes/informe_final.md`](informes/informe_final.md) con las 7 secciones pedidas.
+
+**Hallazgos principales** (de `salidas/cruce_credito_directo.json`):
+
+- **Asociación negativa:** donde hay más pobreza hay menos crédito por habitante. La correlación de Spearman es
+  −0.60 (p = 0.001, 25 departamentos), y −0.72 sin Lima y Callao.
+- **Brecha:** Lima tiene unos S/ 26 460 de crédito por habitante y Huancavelica S/ 1 180, una brecha de 22 veces.
+  Lima concentra el 73 % del crédito.
+- **Caída real:** el crédito subió 10.2 % en soles corrientes, pero bajó 9.3 % en términos reales entre 2020 y 2024,
+  y cayó en 18 de 25 departamentos. La caída mediana fue menor en los departamentos más pobres (−2.1 % frente a
+  −11.6 %), pero esa diferencia no es significativa (p = 0.32).
+- **Piura:** 31.9 % de pobreza, S/ 4 551 de crédito por habitante y −13.7 % de variación real.
+
+**Verificación:** un recálculo independiente del código del proyecto coincide en 7 de 7 cifras
+([`informes/verificacion_automatica.md`](informes/verificacion_automatica.md)); la comprobación manual de 5 cifras
+está en [`informes/verificacion.md`](informes/verificacion.md).
+
+**Manejo de errores.** Antes de esa ejecución hubo tres intentos que quedaron como evidencia, y en los tres el agente
+se detuvo y explicó el problema en vez de inventar cifras:
+
+- **Intento 1:** una ruta de archivo pasaba el límite de 260 caracteres de Windows.
+- **Intento 2:** no tenía permiso para escribir en una ruta con el nombre corto de Windows.
+- **Intento 3:** se cortó por el límite de uso.
+
+Además, ante la pobreza de Piura en **2025**, el agente respondió que la ENAHO 2025 no está en el proyecto. Dio el
+crédito de 2025 y explicó que sin la población de 2025 no puede calcular el crédito por habitante
+([registro](evidencias_ia/integracion/04_manejo_de_errores.md)).
 
 ## 12. Evidencias del uso de inteligencia artificial
 
@@ -219,7 +277,7 @@ Todo está en [`evidencias_ia/`](evidencias_ia/), sin rutas personales ni correo
 |---|---|
 | [`mcp/`](evidencias_ia/mcp/) | `pruebas.txt` (10 passed, con la verificación de que `test_server.py` es idéntico al del curso) y 5 ejecuciones de Claude Code con el MCP: herramientas, herramienta propia, recursos, prompt y una consulta sin datos |
 | [`skills/`](evidencias_ia/skills/) | 6 ejecuciones de Claude Code con las Skills: el mapa pedido en lenguaje natural que activa limpieza y mapa en cadena, un gráfico y una pregunta en lenguaje natural, y la invocación directa de cada Skill con `/nombre` |
-| `integracion/` | *Parte 3* |
+| [`integracion/`](evidencias_ia/integracion/) | La ejecución completa del agente ([`05_ejecucion_agente.md`](evidencias_ia/integracion/05_ejecucion_agente.md)), los tres intentos anteriores en los que el agente informó el error sin inventar, y la prueba de manejo de errores con un año sin datos de la ENAHO |
 | `evaluacion/` | *Parte 4* |
 
 **Conversaciones de desarrollo (Opción B, exportación).** Cada carpeta tiene `00_conversacion.md` (legible) y

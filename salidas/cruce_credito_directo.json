@@ -1,0 +1,90 @@
+{
+ "pregunta": "asociación entre la pobreza monetaria y el indicador del BCRP por habitante, 25 departamentos",
+ "indicador": "Crédito directo del sistema financiero al sector privado por departamentos - fin de periodo (millones S/)",
+ "unidad": "millones S/",
+ "anio": 2024,
+ "anio_base": 2020,
+ "fuente_bcrp": "https://estadisticas.bcrp.gob.pe/estadisticas/series/api/RD16127DA-RD16130DA-RD16133DA-RD16136DA-RD16139DA-RD16142DA-RD16145DA-RD16148DA-RD16151DA-RD16154DA-RD16157DA-RD16160DA-RD16163DA-RD16166DA-RD16169DA-RD16172DA-RD16175DA-RD16178DA-RD16181DA-RD16184DA-RD16187DA-RD16190DA-RD16193DA-RD16196DA-RD16199DA-RD16202DA/json/2020/2024",
+ "fuente_enaho": "INEI, ENAHO 2024 (hogares: factor07 × mieperho (INEI))",
+ "n_departamentos": 25,
+ "nacional": {
+  "total": 407351.74,
+  "total_base": 369826.1,
+  "por_habitante": 11813.22,
+  "variacion_nominal_pct": 10.15,
+  "variacion_real_pct": -9.35
+ },
+ "concentracion_lima_pct": 73.27,
+ "por_habitante_max": {
+  "departamento": "Lima",
+  "por_habitante": 26460.51977830849
+ },
+ "por_habitante_min": {
+  "departamento": "Huancavelica",
+  "por_habitante": 1180.2381154403492
+ },
+ "brecha_max_min": 22.4,
+ "spearman_pobreza_vs_por_habitante": {
+  "rho": -0.604,
+  "p_valor": 0.0014,
+  "n": 25
+ },
+ "spearman_sin_lima_callao": {
+  "rho": -0.718,
+  "p_valor": 0.0005,
+  "n": 23
+ },
+ "inflacion": {
+  "codigo": "PN38705PM",
+  "nombre": "Índice de precios Lima Metropolitana (índice Dic.2021 = 100) - Índice de Precios al Consumidor (IPC)",
+  "desde": "2020-12",
+  "hasta": "2024-12",
+  "indice_desde": 93.9581285619732,
+  "indice_hasta": 114.172077,
+  "inflacion_pct": 21.514,
+  "fuente": "https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN38705PM/json/2020-12/2024-12"
+ },
+ "departamentos_con_caida_real": 18,
+ "spearman_pobreza_vs_variacion_real": {
+  "rho": 0.207,
+  "p_valor": 0.321,
+  "n": 25
+ },
+ "terciles_de_pobreza": [
+  {
+   "tercil_pobreza": "Menor pobreza",
+   "n": 9,
+   "pobreza_mediana": 15.78,
+   "por_habitante_mediana": 5649.7,
+   "variacion_nominal_mediana": 7.45,
+   "variacion_real_mediana": -11.58,
+   "departamentos": "Ica, Moquegua, Madre de Dios, Lambayeque, Arequipa, Junín, Cusco, San Martín, Áncash"
+  },
+  {
+   "tercil_pobreza": "Pobreza media",
+   "n": 8,
+   "pobreza_mediana": 26.98,
+   "por_habitante_mediana": 4125.38,
+   "variacion_nominal_mediana": 11.19,
+   "variacion_real_mediana": -8.5,
+   "departamentos": "Apurímac, Tacna, Amazonas, Tumbes, Lima, Ucayali, La Libertad, Piura"
+  },
+  {
+   "tercil_pobreza": "Mayor pobreza",
+   "n": 8,
+   "pobreza_mediana": 38.97,
+   "por_habitante_mediana": 2878.04,
+   "variacion_nominal_mediana": 18.91,
+   "variacion_real_mediana": -2.14,
+   "departamentos": "Ayacucho, Huancavelica, Callao, Huánuco, Pasco, Puno, Loreto, Cajamarca"
+  }
+ ],
+ "archivos": {
+  "tabla": "salidas/cruce_credito_directo.csv",
+  "panel_bcrp": "salidas/bcrp/panel_credito_directo_sistema_2024_2020.csv",
+  "ipc_bcrp": "salidas/bcrp/serie_PN38705PM_2020-12_2024-12.csv",
+  "enaho": "salidas/indicadores.csv",
+  "figura_variacion": "figuras/bcrp_credito_directo_real_2020_2024.png",
+  "figura_dispersion": "figuras/credito_directo_vs_pobreza_2024.png"
+ }
+}

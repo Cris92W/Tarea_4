@@ -1,0 +1,26 @@
+ccdd,departamento,pobreza_pct,poblacion,valor,por_habitante,tercil_pobreza
+01,Amazonas,25.75,442355.0,1076.92,2434.52,Pobreza media
+02,Áncash,22.77,1212494.0,4278.44,3528.63,Menor pobreza
+03,Apurímac,23.96,494189.0,1695.06,3429.98,Pobreza media
+04,Arequipa,15.78,1421684.0,14325.75,10076.61,Menor pobreza
+05,Ayacucho,32.76,775447.0,2021.91,2607.41,Mayor pobreza
+06,Cajamarca,45.01,1554586.0,5792.01,3725.76,Mayor pobreza
+07,Callao,33.86,1142618.0,6288.53,5503.61,Mayor pobreza
+08,Cusco,18.54,1409467.0,7251.21,5144.65,Menor pobreza
+09,Huancavelica,33.4,543103.0,640.99,1180.24,Mayor pobreza
+10,Huánuco,38.96,926653.0,2533.18,2733.69,Mayor pobreza
+11,Ica,6.01,854203.0,6340.5,7422.71,Menor pobreza
+12,Junín,18.5,1450149.0,8192.9,5649.7,Menor pobreza
+13,La Libertad,30.19,2080789.0,12233.43,5879.22,Pobreza media
+14,Lambayeque,14.04,1349731.0,7191.34,5327.98,Menor pobreza
+15,Lima,27.07,11279909.0,298472.26,26460.52,Pobreza media
+16,Loreto,42.97,1129071.0,2348.99,2080.46,Mayor pobreza
+17,Madre de Dios,11.15,165992.0,1108.71,6679.32,Menor pobreza
+18,Moquegua,10.97,198386.0,1270.0,6401.68,Menor pobreza
+19,Pasco,38.97,327776.0,990.67,3022.39,Mayor pobreza
+20,Piura,31.86,1988570.0,9049.12,4550.57,Pobreza media
+21,Puno,39.94,1586886.0,4964.17,3128.25,Mayor pobreza
+22,San Martín,22.02,947446.0,3756.34,3964.7,Menor pobreza
+23,Tacna,23.99,380755.0,2662.59,6992.93,Pobreza media
+24,Tumbes,26.9,261959.0,800.21,3054.71,Pobreza media
+25,Ucayali,27.07,558484.0,2066.5,3700.19,Pobreza media
