@@ -13,6 +13,7 @@ agente funcionan.
 | [`skills/`](skills/) | [`00_conversacion.md`](skills/00_conversacion.md): las Skills de la ENAHO, gráficos, mapa y exportación de evidencias | 6 ejecuciones: activación por lenguaje natural, coordinación limpieza → mapa e invocación directa de cada Skill |
 | [`integracion/`](integracion/) | [`00_conversacion.md`](integracion/00_conversacion.md): pregunta de investigación, skill de cruce, ejecuciones del agente, verificación y evaluación | `05_ejecucion_agente`: la investigación completa (4 Skills y 3 herramientas MCP en una ejecución); 01 a 03, intentos en los que el agente informó el error sin inventar; 04, prueba con un año sin datos |
 | [`evaluacion/`](evaluacion/) | (está en la conversación de `integracion/`) | Las 20 ejecuciones de la evaluación, `<pregunta>_<modo>` |
+| [`entrega/`](entrega/) | [`00_conversacion.md`](entrega/00_conversacion.md): revisión final contra el issue, subida de las Partes 2 a 4 a `main`, guía y corrección de la verificación manual y redacción del comentario de entrega | — |
 
 Cada ejecución tiene dos archivos: `.jsonl`, el registro crudo de `--output-format stream-json` con cada
 herramienta y lo que devolvió, y `.md`, el mismo registro legible.
